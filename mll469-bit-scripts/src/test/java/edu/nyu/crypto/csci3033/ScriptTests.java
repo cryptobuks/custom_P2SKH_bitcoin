@@ -5,7 +5,9 @@ import org.bitcoinj.core.*;
 import org.bitcoinj.kits.WalletAppKit;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.params.TestNet3Params;
+import org.bitcoinj.crypto.TransactionSignature;
 import org.bitcoinj.script.Script;
+import org.bitcoinj.script.ScriptBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -69,64 +71,75 @@ public class ScriptTests {
         redemptionTransaction.getInput(0).setScriptSig(redeemScript);
         scriptTransaction.sendTransaction(transaction);
         scriptTransaction.sendTransaction(redemptionTransaction);
+        return;
     }
 
     // TODO: Uncomment this once you have coins on mainnet or testnet to check that transactions are working as expected.
-//    @Test
-//    public void testPayToPubKey() throws InsufficientMoneyException {
-//        try (ScriptTransaction payToPubKey = new PayToPubKey(networkParameters, new File(wallet_name), "password")) {
-//            testTransaction(payToPubKey);
-//
-//       } catch (Exception e) {
-//            e.printStackTrace();
-//            Assert.fail(e.getMessage());
-//        }
-//    }
+   @Test
+   public void testPayToPubKey() throws InsufficientMoneyException {
+       try (ScriptTransaction payToPubKey = new PayToPubKey(networkParameters, new File(wallet_name), "password")) {
+           testTransaction(payToPubKey);
+        return;
+      } catch (Exception e) {
+           e.printStackTrace();
+           Assert.fail(e.getMessage());
+           return;
+       }
+   }
 
     // TODO: Uncomment this when you are ready to test PayToPubKeyHash.
-//    @Test
-//    public void testPayToPubKeyHash() throws InsufficientMoneyException {
-//        try (ScriptTransaction payToPubKeyHash = new PayToPubKeyHash(networkParameters, new File(wallet_name), "password")) {
-//            testTransaction(payToPubKeyHash);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Assert.fail(e.getMessage());
-//        }
-//    }
+   @Test
+   public void testPayToPubKeyHash() throws InsufficientMoneyException {
+       try (ScriptTransaction payToPubKeyHash = new PayToPubKeyHash(networkParameters, new File(wallet_name), "password")) {
+           testTransaction(payToPubKeyHash);
+           return;
+       } catch (Exception e) {
+           e.printStackTrace();
+           Assert.fail(e.getMessage());
+           return;
+       }
+   }
 
    //  TODO: Uncomment this when you are ready to test LinearEquationTransaction.
    @Test
    public void testLinearEquation() throws InsufficientMoneyException {
-       try (LinearEquationTransaction linEq = new LinearEquationTransaction(networkParameters, new File(wallet_name), "password")) {
+       try (LinearEquationTransaction linEq = new LinearEquationTransaction(networkParameters, new File(wallet_name), "akkis=cool")) {
            testTransaction(linEq);
+           return;
        } catch (Exception e) {
            e.printStackTrace();
            Assert.fail(e.getMessage());
+           return;
        }
    }
 
     // TODO: Uncomment this when you are ready to test MultiSigTransaction.
-//    @Test
-//    public void testMultiSig() throws InsufficientMoneyException {
-//        try (ScriptTransaction multiSig = new MultiSigTransaction(networkParameters, new File(wallet_name), "password")) {
-//            testTransaction(multiSig);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Assert.fail(e.getMessage());
-//        }
-//    }
+   @Test
+   public void testMultiSig() throws InsufficientMoneyException {
+       try (ScriptTransaction multiSig = new MultiSigTransaction(networkParameters, new File(wallet_name), "password")) {
+           testTransaction(multiSig);
+           return;
+       } catch (Exception e) {
+           e.printStackTrace();
+           Assert.fail(e.getMessage());
+           return;
+       }
+   }
 
     // TODO: Uncomment this when you are ready to send money back to Faucet on testnet.
-//    @Test
-//    public void sendMoneyBackToFaucet() throws AddressFormatException, InsufficientMoneyException {
-//        if (useMainNet) {
-//            return;
-//        }
-//        downloadBlockchain();
-//        Transaction transaction = kit.wallet().createSend(new Address(networkParameters, faucetAddress), kit.wallet().getBalance().subtract(Coin.MILLICOIN));
-//        kit.wallet().commitTx(transaction);
-//        kit.peerGroup().broadcastTransaction(transaction);
-//        kit.stopAsync();
-//        kit.awaitTerminated();
-//    }
+   @Test
+   public void sendMoneyBackToFaucet() throws AddressFormatException, InsufficientMoneyException {
+       if (useMainNet) {
+           return;
+       }
+       downloadBlockchain();
+       Transaction transaction = kit.wallet().createSend(new Address(networkParameters, faucetAddress), kit.wallet().getBalance().subtract(Coin.MILLICOIN));
+       kit.wallet().commitTx(transaction);
+       kit.peerGroup().broadcastTransaction(transaction);
+       kit.stopAsync();
+       kit.awaitTerminated();
+       return;
+   }
+
+
 }

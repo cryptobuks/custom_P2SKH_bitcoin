@@ -2,7 +2,9 @@ package edu.nyu.crypto.csci3033.transactions;
 
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.core.Transaction;
+import org.bitcoinj.crypto.TransactionSignature;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
@@ -20,10 +22,21 @@ public class LinearEquationTransaction extends ScriptTransaction {
     // TODO: Problem 2
 
     // Get us a key. 
-    ECKey key = randKey();
+    private DeterministicKey key;
 
     public LinearEquationTransaction(NetworkParameters parameters, File file, String password) {
         super(parameters, file, password);
+        key = getWallet().freshReceiveKey();
+    }
+
+    public static byte[] hexStringToByteArray(String s) {
+    int len = s.length();
+    byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                                 + Character.digit(s.charAt(i+1), 16));
+        }
+    return data;
     }
 
     @Override
@@ -42,10 +55,12 @@ public class LinearEquationTransaction extends ScriptTransaction {
                 x=3629, y=-1980 :) 
             */
 
-            // Therefore, correct scriptSig will be <3629> <-1980>, pushing these two values onto the stack (prepended, concatenated in front)
+
+            // Therefore, correct scriptSig will be <3629> <1980> (in byte form), pushing these two values onto the stack (prepended, concatenated in front)
+            // This script is under an assumption that negative values will undergo abs() for clarity. Despite this choice, conceptually it is the same that the scriptSig must be precisely known. 
             // Stack:
-            // 3629
-            // -1980
+            // 3629 (hex is 0E2D)
+            // 1980 (hex of abs is 07BC)
             
             /* Will list the following scriptPubKey operations here for cleanliness:
 
@@ -81,31 +96,44 @@ public class LinearEquationTransaction extends ScriptTransaction {
                 Top two should be equal. 
                     * VERIFIED & POPPED 
 
-                Check the signature of the whole transaction. 
+                SUCCESS - 
 
 
             */
             
+            bld.op(OP_NEGATE);
+
             bld.op(OP_2DUP);
             bld.op(OP_ADD);
-            bld.data(1649);
+            byte[] r1649 = hexStringToByteArray("7106");
+            bld.data(r1649); // 1649 dec to hex is 0x671. Since bitcoin is little-endian, we reverse to order to 7106.  
             bld.op(OP_EQUALVERIFY);
             bld.op(OP_SUB);
-            bld.data(5609);
+            byte[] r5609 = hexStringToByteArray("E915"); // 5609 dec is 0x15E9. Little endian to E915. 
+            bld.data(r5609);
             bld.op(OP_EQUALVERIFY);
-            bld.op(OP_CHECKSIG);
 
             // See above for explanation!
-
-
         
-        return null;
+        return bld.build();
     }
 
     @Override
     public Script createRedemptionScript(Transaction unsignedScript) {
         // TODO: Create a spending script
-        return null;
+
+        TransactionSignature txSig = sign(unsignedScript, key);
+        ScriptBuilder builder = new ScriptBuilder();
+
+            // 3629 (hex is 0E2D)
+            // 1980 (hex is 07BC)
+        byte[] r3629 = hexStringToByteArray("2D0E"); // little endian
+        byte[] r1980 = hexStringToByteArray("BC07");
+
+       builder.data(r3629); // This will be the "scriptSig"
+       builder.data(r1980); // just the values x, y [abs(y)]
+
+        return builder.build();
     }
 
     private byte[] encode(BigInteger bigInteger) {

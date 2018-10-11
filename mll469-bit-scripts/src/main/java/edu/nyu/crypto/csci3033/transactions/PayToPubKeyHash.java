@@ -3,7 +3,6 @@ package edu.nyu.crypto.csci3033.transactions;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.crypto.DeterministicKey;
-import org.bitcoinj.core.ECKey;
 import org.bitcoinj.crypto.TransactionSignature;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
@@ -19,10 +18,11 @@ import static org.bitcoinj.script.ScriptOpCodes.OP_VERIFY;
 public class PayToPubKeyHash extends ScriptTransaction {
     // TODO: Problem 1
 
-    ECKey key = randKey();
+    private DeterministicKey key;
 
     public PayToPubKeyHash(NetworkParameters parameters, File file, String password) {
         super(parameters, file, password);
+        key = getWallet().freshReceiveKey();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PayToPubKeyHash extends ScriptTransaction {
 
         // Classical transaction complete. 
 
-        return null;
+        return bld.build();
     }
 
     @Override
@@ -59,9 +59,8 @@ public class PayToPubKeyHash extends ScriptTransaction {
         // TODO: Redeem the P2PKH transaction
 
         TransactionSignature txSig = sign(unsignedTransaction, key);
-            ScriptBuilder builder = new ScriptBuilder();
-            builder.data(txSig.encodeToBitcoin()).data(key.getPubKey);
-            return builder.build();
-        return null;
+        ScriptBuilder builder = new ScriptBuilder();
+        builder.data(txSig.encodeToBitcoin()).data(key.getPubKey());
+        return builder.build();
     }
 }

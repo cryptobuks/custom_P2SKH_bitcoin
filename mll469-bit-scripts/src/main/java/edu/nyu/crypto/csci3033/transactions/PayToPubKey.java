@@ -16,11 +16,8 @@ import static org.bitcoinj.script.ScriptOpCodes.*;
  * Created by bbuenz on 24.09.15.
  */
 
-/**
- * Deconstructed by m-luck on 9.Oct.18
- */
-
 public class PayToPubKey extends ScriptTransaction {
+
     private DeterministicKey key;
 
     public PayToPubKey(NetworkParameters parameters, File file, String password) {
